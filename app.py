@@ -1,47 +1,53 @@
 import streamlit as st
 
-# Replace with your GitHub raw URL
-video_url = "https://github.com/sangambhamare/Website-Animation/blob/master/Blue%20Neon%20Tech%20Coming%20Soon%20Video.mp4"
+# CSS code for an animated gradient background
+css_animation = """
+<style>
+/* Full-screen container for the animation */
+body, html {
+    margin: 0;
+    padding: 0;
+    height: 100%;
+    overflow: hidden;
+}
 
-st.markdown(
-    f"""
-    <style>
-    body, html {{
-        margin: 0;
-        padding: 0;
-        overflow: hidden;
-    }}
-    .video-background {{
-        position: fixed;
-        top: 0;
-        left: 0;
-        min-width: 100%;
-        min-height: 100%;
-        width: auto;
-        height: auto;
-        z-index: -1;
-        background-size: cover;
-    }}
-    .content {{
-        position: relative;
-        z-index: 1;
-        color: white;
-        text-align: center;
-        padding: 50px;
-    }}
-    </style>
-    
-    <video autoplay muted loop class="video-background">
-      <source src="{video_url}" type="video/mp4">
-      Your browser does not support the video tag.
-    </video>
-    
-    <div class="content">
-      <h1>Welcome to My Streamlit App</h1>
-      <p>This content is displayed over the video background.</p>
-    </div>
-    """,
-    unsafe_allow_html=True
-)
+/* The animated gradient background */
+.animated-bg {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(45deg, #ff9a9e, #fad0c4, #fad0c4, #ff9a9e);
+    background-size: 400% 400%;
+    animation: gradientAnimation 15s ease infinite;
+    z-index: -1;
+}
 
-st.write("Main app content goes here.")
+/* Keyframes for the gradient animation */
+@keyframes gradientAnimation {
+    0% {background-position: 0% 50%;}
+    50% {background-position: 100% 50%;}
+    100% {background-position: 0% 50%;}
+}
+
+/* Optional styling for overlay content */
+.content {
+    position: relative;
+    z-index: 1;
+    text-align: center;
+    color: white;
+    padding: 50px;
+}
+</style>
+
+<div class="animated-bg"></div>
+<div class="content">
+  <h1>Welcome to My Animated Streamlit App</h1>
+  <p>This is an example of a custom CSS animated background.</p>
+</div>
+"""
+
+st.markdown(css_animation, unsafe_allow_html=True)
+
+st.write("Main app content goes here...")
