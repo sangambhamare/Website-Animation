@@ -1,21 +1,20 @@
 import streamlit as st
 import streamlit.components.v1 as components
 
-# HTML, CSS, and JavaScript code using Three.js with multiple moving technical shapes
-threejs_shapes_html = """
+advanced_threejs_html = """
 <!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>Three.js Moving Technical Shapes</title>
+  <title>Advanced Neon Tech Shapes with Bloom</title>
   <style>
-    /* Fullscreen styling */
+    /* Fullscreen setup */
     body, html {
       margin: 0;
       padding: 0;
       overflow: hidden;
       height: 100%;
-      background: #000428; /* Dark blue background */
+      background: #000428; /* Dark blue backdrop */
     }
     /* The canvas fills the entire window */
     #bg-canvas {
@@ -49,87 +48,125 @@ threejs_shapes_html = """
   
   <!-- Overlay content -->
   <div class="content">
-    <h1>Neon Tech Shapes</h1>
-    <p>Experience moving technical shapes in a futuristic neon style.</p>
+    <h1>Advanced Neon Tech Shapes</h1>
+    <p>Enjoy advanced animations with glowing bloom effects!</p>
   </div>
   
-  <!-- Include Three.js via CDN -->
+  <!-- Include Three.js library -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+  <!-- Include EffectComposer and bloom passes for postprocessing -->
+  <script src="https://unpkg.com/three@0.128.0/examples/js/postprocessing/EffectComposer.js"></script>
+  <script src="https://unpkg.com/three@0.128.0/examples/js/postprocessing/RenderPass.js"></script>
+  <script src="https://unpkg.com/three@0.128.0/examples/js/postprocessing/UnrealBloomPass.js"></script>
+  
   <script>
-    // Setup scene, camera, and renderer
-    const scene = new THREE.Scene();
-    scene.background = new THREE.Color(0x000428);
+    let scene, camera, renderer, composer, bloomPass;
+    let shapes = [];
+    const neonColor = new THREE.Color(0x00ffff); // Neon blue color
 
-    const camera = new THREE.PerspectiveCamera(75, window.innerWidth/window.innerHeight, 0.1, 1000);
-    camera.position.z = 8;
+    // Parameters for bloom effect
+    const params = {
+      exposure: 1,
+      bloomStrength: 1.5,
+      bloomThreshold: 0,
+      bloomRadius: 0
+    };
 
-    const renderer = new THREE.WebGLRenderer({ canvas: document.getElementById("bg-canvas"), antialias: true });
-    renderer.setSize(window.innerWidth, window.innerHeight);
+    function init() {
+      // Create scene and camera
+      scene = new THREE.Scene();
+      scene.background = new THREE.Color(0x000428); // Dark blue background
+      
+      camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+      camera.position.z = 10;
 
-    // Create an array to hold our shapes
-    const shapes = [];
-    const neonColor = 0x00ffff; // Neon blue
+      // Setup renderer
+      renderer = new THREE.WebGLRenderer({ canvas: document.getElementById("bg-canvas"), antialias: true });
+      renderer.setSize(window.innerWidth, window.innerHeight);
+      renderer.toneMappingExposure = Math.pow(params.exposure, 4.0);
 
-    // Helper function to create a shape and add it to the scene
-    function createShape(geometry, x, y, z) {
-      const material = new THREE.MeshBasicMaterial({ color: neonColor, wireframe: true });
-      const mesh = new THREE.Mesh(geometry, material);
-      mesh.position.set(x, y, z);
-      // Store a random rotation speed for each shape
-      mesh.userData = { rotationSpeed: Math.random() * 0.02 + 0.01, drift: Math.random() * 0.005 + 0.002 };
-      scene.add(mesh);
-      shapes.push(mesh);
-    }
+      // Set up postprocessing (composer with bloom)
+      composer = new THREE.EffectComposer(renderer);
+      const renderScene = new THREE.RenderPass(scene, camera);
+      composer.addPass(renderScene);
+      
+      bloomPass = new THREE.UnrealBloomPass(
+        new THREE.Vector2(window.innerWidth, window.innerHeight),
+        params.bloomStrength,
+        params.bloomRadius,
+        params.bloomThreshold
+      );
+      composer.addPass(bloomPass);
 
-    // Create multiple shapes with different geometries and random positions
-    for (let i = 0; i < 5; i++) {
-      // Random positions in a range
-      const posX = (Math.random() - 0.5) * 12;
-      const posY = (Math.random() - 0.5) * 12;
-      const posZ = (Math.random() - 0.5) * 12;
-      // Alternate geometries: cube, torus, and sphere
-      if (i % 3 === 0) {
-        createShape(new THREE.BoxGeometry(2, 2, 2), posX, posY, posZ);
-      } else if (i % 3 === 1) {
-        createShape(new THREE.TorusGeometry(1.2, 0.4, 16, 100), posX, posY, posZ);
-      } else {
-        createShape(new THREE.SphereGeometry(1.2, 32, 32), posX, posY, posZ);
+      // Create multiple advanced shapes
+      for (let i = 0; i < 15; i++) {
+        let geometry;
+        // Randomly choose a geometry: cube, torus, or sphere
+        const rand = Math.random();
+        if (rand < 0.33) {
+          geometry = new THREE.BoxGeometry(1.5, 1.5, 1.5);
+        } else if (rand < 0.66) {
+          geometry = new THREE.TorusGeometry(0.8, 0.3, 16, 100);
+        } else {
+          geometry = new THREE.SphereGeometry(0.8, 32, 32);
+        }
+        const material = new THREE.MeshBasicMaterial({ color: neonColor, wireframe: true });
+        const mesh = new THREE.Mesh(geometry, material);
+        // Set random initial position within a range
+        mesh.position.set((Math.random()-0.5)*20, (Math.random()-0.5)*20, (Math.random()-0.5)*20);
+        // Assign random rotation speeds and drift directions
+        mesh.userData = {
+          rotationSpeedX: (Math.random()-0.5)*0.05,
+          rotationSpeedY: (Math.random()-0.5)*0.05,
+          driftX: (Math.random()-0.5)*0.02,
+          driftY: (Math.random()-0.5)*0.02,
+          driftZ: (Math.random()-0.5)*0.02
+        };
+        scene.add(mesh);
+        shapes.push(mesh);
       }
     }
 
-    // Animation loop to rotate and move the shapes
     function animate() {
       requestAnimationFrame(animate);
-
+      
+      // Update shapes rotation and position
       shapes.forEach(mesh => {
-        // Rotate the shape
-        mesh.rotation.x += mesh.userData.rotationSpeed;
-        mesh.rotation.y += mesh.userData.rotationSpeed;
-        // Make the shape drift slowly along the y-axis
-        mesh.position.y += mesh.userData.drift;
-        // Reverse drift direction if out of bounds
-        if (mesh.position.y > 6 || mesh.position.y < -6) {
-          mesh.userData.drift = -mesh.userData.drift;
-        }
+        mesh.rotation.x += mesh.userData.rotationSpeedX;
+        mesh.rotation.y += mesh.userData.rotationSpeedY;
+        mesh.position.x += mesh.userData.driftX;
+        mesh.position.y += mesh.userData.driftY;
+        mesh.position.z += mesh.userData.driftZ;
+        // Wrap around if a shape moves too far from the center
+        if (mesh.position.x > 10) mesh.position.x = -10;
+        if (mesh.position.x < -10) mesh.position.x = 10;
+        if (mesh.position.y > 10) mesh.position.y = -10;
+        if (mesh.position.y < -10) mesh.position.y = 10;
+        if (mesh.position.z > 10) mesh.position.z = -10;
+        if (mesh.position.z < -10) mesh.position.z = 10;
       });
-
-      renderer.render(scene, camera);
+      
+      // Render the scene using composer to include bloom effect
+      composer.render();
     }
-    animate();
 
-    // Adjust renderer and camera on window resize
+    // Adjust camera and renderer on window resize for responsiveness
     window.addEventListener('resize', function(){
-      renderer.setSize(window.innerWidth, window.innerHeight);
       camera.aspect = window.innerWidth / window.innerHeight;
       camera.updateProjectionMatrix();
+      renderer.setSize(window.innerWidth, window.innerHeight);
+      composer.setSize(window.innerWidth, window.innerHeight);
     });
+
+    init();
+    animate();
   </script>
 </body>
 </html>
 """
 
-# Embed the HTML code into your Streamlit app
-components.html(threejs_shapes_html, height=700)
+# Embed the advanced HTML code into the Streamlit app
+components.html(advanced_threejs_html, height=700)
 
-# Main Streamlit app content below the animation
-st.write("Your main Streamlit app content goes here.")
+# Additional main content for your Streamlit app
+st.write("Main Streamlit app content goes here.")
