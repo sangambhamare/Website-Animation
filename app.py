@@ -1,7 +1,7 @@
 import streamlit as st
 
 # Replace with your GitHub raw URL
-video_url = "https://raw.githubusercontent.com/your_username/your_repo/main/path/to/video.mp4"
+video_url = "https://github.com/sangambhamare/Website-Animation/blob/master/Blue%20Neon%20Tech%20Coming%20Soon%20Video.mp4"
 
 st.markdown(
     f"""
